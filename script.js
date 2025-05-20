@@ -421,6 +421,19 @@ function setupOrderTracking() {
     
   let orderId = setupzoneOrderIdInput.value.trim().toUpperCase();
 
+  const darkModeSound = document.getElementById("darkModeSound");
+
+// Inside your existing toggle function, after dark mode is applied:
+if (document.body.classList.contains("dark-mode")) {
+  darkModeSound.currentTime = 0.1;
+  darkModeSound.volume = 0.5;
+  darkModeSound.muted = false;
+
+  darkModeSound.play().catch(e => {
+    console.log("Autoplay blocked: ", e);
+  });
+}
+
 // Ensure it starts with "ORD-"
 if (!orderId.startsWith("ORD-")) {
   orderId = "ORD-" + orderId;
@@ -1257,12 +1270,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-const darkModeSound = document.getElementById("darkModeSound");
-
-
-  // Check if dark mode is now active
-  if (document.body.classList.contains("dark-mode")) {
-    darkModeSound.currentTime = 0; // Rewind if playing
-    darkModeSound.play();
-  }
