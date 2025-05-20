@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Browse premium gaming room decor products, including furniture, posters, lighting, and more." />
+  <title>Premium Product Grid</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Add these to your HTML head -->
+<!-- Replace your current Firebase scripts with these -->
+<!-- Load these before your script.js -->
+<!-- Replace your current Firebase scripts with these -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<!-- EmailJS SDK v3 UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("lr-VJt44cVESpln8f"); // Replace with your actual public key
+</script>
+
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header"><div>
+ <button id="menu-toggle" class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+  <span class="menu-icon">☰</span>
+  <span class="menu-text">MENU</span>
+</button>
+
+  <!-- Header -->
+    <div class="logo"> CRYO_Byte_</div>
+    <nav class="nav-links">
+      <a href="#">🏠 Home</a>
+    <a  id="trackOrderBtn">🛍️ Track Order</a>
+      <a href="#">ℹ️ About</a>
+      <a href="#">📞 Contact</a>
+    </nav>
+    </div>
+  
+  </header>
+
+  <!-- Order Tracking Modal (unique ID) -->
+<div id="setupzoneTrackingModal" class="setupzone-modal">
+  <div class="setupzone-modal-content">
+    <span class="setupzone-close">&times;</span>
+    <h2>Order Tracking</h2>
+    <div class="setupzone-tracking-form">
+      <input type="text" id="setupzoneOrderIdInput" placeholder="Enter your order ID">
+      <button id="setupzoneSearchOrderBtn">Search</button>
+    </div>
+    <div id="setupzoneOrderDetails" class="setupzone-order-details hidden">
+      <h3>Order #<span id="setupzoneOrderNumber"></span></h3>
+      <div class="setupzone-status-timeline">
+        <div class="setupzone-status-step" id="setupzone-step-ordered">
+          <div class="setupzone-status-icon">📦</div>
+          <div class="setupzone-status-text">Order Placed</div>
+          <div class="setupzone-status-date"></div>
+        </div>
+        <div class="setupzone-status-step" id="setupzone-step-processed">
+          <div class="setupzone-status-icon">🏭</div>
+          <div class="setupzone-status-text">Processing</div>
+          <div class="setupzone-status-date"></div>
+        </div>
+        <div class="setupzone-status-step" id="setupzone-step-shipped">
+          <div class="setupzone-status-icon">🚚</div>
+          <div class="setupzone-status-text">Shipped</div>
+          <div class="setupzone-status-date"></div>
+        </div>
+        <div class="setupzone-status-step" id="setupzone-step-delivered">
+          <div class="setupzone-status-icon">🏡</div>
+          <div class="setupzone-status-text">Delivered</div>
+          <div class="setupzone-status-date"></div>
+        </div>
+      </div>
+      <div class="setupzone-delivery-info">
+        <h4>Delivery Information</h4>
+        <p><strong>Carrier:</strong> <span id="setupzoneCarrier"></span></p>
+        <p><strong>Tracking Number:</strong> <span id="setupzoneTrackingNumber"></span></p>
+        <p><strong>Estimated Delivery:</strong> <span id="setupzoneEstimatedDelivery"></span></p>
+      </div>
+    </div>
+    <div id="setupzoneOrderNotFound" class="hidden">
+      <p>Order not found. Please check your order ID and try again.</p>
+    </div>
+  </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="search-container" style="position: relative;">
+        <input type="text" id="search-bar" placeholder="Search for products..." />
+        <ul id="suggestions"></ul> <!-- Suggestions will appear here -->
+      </div>
+      
+    <select id="category-filter">
+      <option value="all">All Categories</option>
+      <option value="posters">Posters</option>
+      <option value="furniture">Furniture</option>
+      <option value="lighting">Lighting</option>
+    </select>
+  
+    <select id="sort-by">
+      <option value="default">Sort by</option>
+      <option value="low-high">Price: Low to High</option>
+      <option value="high-low">Price: High to Low</option>
+    </select>
+  </div>
+
+  <!-- Modal -->
+<div id="product-modal" class="modal" role="dialog" aria-hidden="true">
+  <div class="modal-content">
+    <span class="close" aria-label="Close modal">&times;</span>
+    <img id="modal-img" src="" alt="Product Image" />
+    <div class="modal-info">
+      
+      <h3 id="modal-title">Product Name</h3>
+      <p id="modal-price">₹0</p>
+      <p id="modal-desc" class="modal-description">Product description</p>
+      <div class="modal-actions">
+        <button id="add-to-cart" class="modal-btn btn-primary">Add to Cart</button>
+        <button id="add-to-wishlist" class="modal-btn btn-secondary">Wishlist</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Product Grid -->
+    <div class="container">
+      <section class="featured-heading">
+    <h6>Featured Items</h6>
+    <div class="grid">
+    
+
+               <!-- Product 1: RGB LED Strip -->
+<div class="card" data-category="lighting">
+    <img src="https://foyr.com/learn/wp-content/uploads/2019/01/lighting-for-gaming-room-scaled.jpg" alt="LED Lighting" />
+    <div class="info">
+        <h3>RGB LED Strip</h3>
+        <p class="discounted">₹1</p><p class="price">₹2999</p>
+        <button class="add-to-cart" 
+                data-name="RGB LED Strip" 
+                data-price="1" 
+                data-image="https://foyr.com/learn/wp-content/uploads/2019/01/lighting-for-gaming-room-scaled.jpg"
+                data-description="16-color remote-controlled LEDs.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 2: Gaming Decor Bundle -->
+<div class="card" data-category="furniture">
+    <img src="https://cdn.shopify.com/s/files/1/0644/5013/4180/files/kushsama_set_up_a_personal_gaming_computer_in_a_girl_room_cute__25ae19a9-7a30-475b-ac34-596114f87b80_480x480.webp?v=1713785010" alt="Gaming Decor" />
+    <div class="info">
+        <h3>Gaming Decor Bundle</h3>
+        <p class="discounted">₹1</p><p class="price">₹3999</p>
+        <button class="add-to-cart" 
+                data-name="Gaming Decor Bundle" 
+                data-price="1" 
+                data-image="https://cdn.shopify.com/s/files/1/0644/5013/4180/files/kushsama_set_up_a_personal_gaming_computer_in_a_girl_room_cute__25ae19a9-7a30-475b-ac34-596114f87b80_480x480.webp?v=1713785010"
+                data-description="Mouse pad + headset stand.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 3: Acoustic Wall Panels -->
+<div class="card" data-category="furniture">
+    <img src="https://m.media-amazon.com/images/I/815NKi8l4kL._UF1000,1000_QL80_.jpg" alt="Wall Panels" />
+    <div class="info">
+        <h3>Acoustic Wall Panels</h3>
+        <p class="discounted">₹1</p><p class="price">₹1499</p>
+        <button class="add-to-cart" 
+                data-name="Acoustic Wall Panels" 
+                data-price="1" 
+                data-image="https://m.media-amazon.com/images/I/815NKi8l4kL._UF1000,1000_QL80_.jpg"
+                modal-description="Sound-absorbing hex panels.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 4: Gaming Chair -->
+<div class="card" data-category="furniture">
+    <img src="https://foyr.com/learn/wp-content/uploads/2019/01/seating-for-gaming-room.jpg" alt="Gaming Chair" />
+    <div class="info">
+        <h3>Gaming Chair</h3>
+        <p class="discounted">₹10</p><p class="price">₹10999</p>
+        <button class="add-to-cart" 
+                data-name="Gaming Chair" 
+                data-price="1" 
+                data-image="https://foyr.com/learn/wp-content/uploads/2019/01/seating-for-gaming-room.jpg"
+                data-description="Adjustable lumbar support.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 5: Smart LED Kit -->
+<div class="card" data-category="lighting">
+    <img src="https://www.almila.com.tr/sites/default/files/styles/content_header_mobile/public/2024-06/37888785-fa43-4243-ae48-2a9ca2f35ff0_atmosphaerisches-gamer-zimmer.jpg.webp?itok=6YA57pOv" alt="Atmosphere Setup" />
+    <div class="info">
+        <h3>Smart LED Kit</h3>
+        <p class="discounted">₹1</p><p class="price">₹4999</p>
+        <button class="add-to-cart" 
+                data-name="Smart LED Kit" 
+                data-price="1" 
+                data-image="https://www.almila.com.tr/sites/default/files/styles/content_header_mobile/public/2024-06/37888785-fa43-4243-ae48-2a9ca2f35ff0_atmosphaerisches-gamer-zimmer.jpg.webp?itok=6YA57pOv"
+                data-description="Music-sync RGB lights.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 6: Gaming Posters -->
+<div class="card" data-category="posters">
+    <img src="https://i.pinimg.com/736x/da/95/0a/da950ab5bd3f8812988bf75113af8d27.jpg" alt="Poster Wall" />
+    <div class="info">
+        <h3>Gaming Posters</h3>
+        <p class="discounted">₹1</p><p class="price">₹699</p>
+        <button class="add-to-cart" 
+                data-name="Gaming Posters" 
+                data-price="1" 
+                data-image="https://i.pinimg.com/736x/da/95/0a/da950ab5bd3f8812988bf75113af8d27.jpg"
+                data-description="Glossy 12x18″ prints.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 7: Gaming Desk -->
+<div class="card" data-category="furniture">
+    <img src="https://cdn.shopify.com/s/files/1/1881/2599/files/0d554ee22af77852eabae82936cee6ee_480x480.jpg?v=1717754907" alt="Minimal Desk" />
+    <div class="info">
+        <h3>Gaming Desk</h3>
+        <p class="discounted">₹69</p><p class="price">₹6999</p>
+        <button class="add-to-cart" 
+                data-name="Gaming Desk" 
+                data-price="1" 
+                data-image="https://cdn.shopify.com/s/files/1/1881/2599/files/0d554ee22af77852eabae82936cee6ee_480x480.jpg?v=1717754907"
+                data-description="55″ cable-management desk.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 8: Anime LED Kit -->
+<div class="card" data-category="lighting">
+    <img src="https://static.wixstatic.com/media/973641_dd18afbf52c44615b55545334043c0ee~mv2.jpg/v1/fill/w_480,h_600,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/973641_dd18afbf52c44615b55545334043c0ee~mv2.jpg" alt="Anime LED Kit" />
+    <div class="info">
+        <h3>Anime LED Kit</h3>
+        <p class="discounted">₹1</p><p class="price">₹2499</p>
+        <button class="add-to-cart" 
+                data-name="Anime LED Kit" 
+                data-price="1" 
+                data-image="https://static.wixstatic.com/media/973641_dd18afbf52c44615b55545334043c0ee~mv2.jpg/v1/fill/w_480,h_600,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/973641_dd18afbf52c44615b55545334043c0ee~mv2.jpg"
+                data-description="Anime silhouette projector.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 9: Game Wall Stickers -->
+<div class="card" data-category="posters">
+    <img src="https://www.huetion.com/media/catalog/product/cache/fc968504d73242eeb5af558e5cfedb2f/g/a/gaming_wall_stickers_for_gaming_room_decor.jpg" alt="Wall Stickers" />
+    <div class="info">
+        <h3>Game Wall Stickers</h3>
+        <p class="discounted">₹1</p><p class="price">₹999</p>
+        <button class="add-to-cart" 
+                data-name="Game Wall Stickers" 
+                data-price="1" 
+                data-image="https://www.huetion.com/media/catalog/product/cache/fc968504d73242eeb5af558e5cfedb2f/g/a/gaming_wall_stickers_for_gaming_room_decor.jpg"
+                data-description="15 vinyl stickers.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 10: LED Shelves -->
+<div class="card" data-category="furniture">
+    <img src="https://images-cdn.ubuy.co.in/66f1469f4206364186049347-gaming-floating-shelves-with-lights-led.jpg" alt="Floating Shelves" />
+    <div class="info">
+        <h3>LED Shelves</h3>
+        <p class="discounted">₹1</p><p class="price">₹2999</p>
+        <button class="add-to-cart" 
+                data-name="LED Shelves" 
+                data-price="1" 
+                data-image="https://images-cdn.ubuy.co.in/66f1469f4206364186049347-gaming-floating-shelves-with-lights-led.jpg"
+                data-description="RGB-lit display shelves.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 11: Gaming Rug -->
+<div class="card" data-category="furniture">
+    <img src="https://images-cdn.ubuy.co.in/64494581a47132191378bd25-large-video-gaming-area-rug-for.jpg" alt="Gaming Rug" />
+    <div class="info">
+        <h3>Gaming Rug</h3>
+        <p class="discounted">₹1</p><p class="price">₹3999</p>
+        <button class="add-to-cart" 
+                data-name="Gaming Rug" 
+                data-price="1" 
+                data-image="https://images-cdn.ubuy.co.in/64494581a47132191378bd25-large-video-gaming-area-rug-for.jpg"
+                data-description="5x7 ft non-slip rug.">
+            Add to Cart
+        </button>
+    </div>
+</div>
+
+<!-- Product 12: Metal Game Art -->
+<div class="card" data-category="posters">
+    <img src="https://portrilux.com/cdn/shop/articles/Portrilux_Metal_Prints_1200x1200_6e066b39-0dd6-4064-a62a-ed3631d519c0.webp?v=1681851705" alt="Metal Prints" />
+    <div class="info">
+        <h3>Metal Game Art</h3>
+        <p class="discounted">₹1</p><p class="price">₹1999</p>
+        <button class="add-to-cart" 
+                data-name="Metal Game Art" 
+                data-price="1" 
+                data-image="https://portrilux.com/cdn/shop/articles/Portrilux_Metal_Prints_1200x1200_6e066b39-0dd6-4064-a62a-ed3631d519c0.webp?v=1681851705"
+                data-description="Durable aluminum prints.">
+            Add to Cart
+        </button>
+      </div>
+    </div>
+</div></section>
+</div>
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Theme Toggle Button -->
+<button id="theme-toggle">🌙</button>
+
+<div id="cart-container">
+  <div id="cart-icon">
+    <span id="cart-count">0</span>
+    🛒
+  </div>
+</div>
+
+<!-- Full-Screen Cart Modal -->
+<div id="cart-box" style="display: none;">
+  <h3>Your Cart <button id="cart-close-btn">×</button></h3>
+  
+  <div id="cart-items-container">
+    <ul id="cart-items">
+      <!-- Cart items will be dynamically inserted here -->
+    </ul>
+  </div>
+  
+  <div id="cart-summary">
+    <p id="cart-total">Total: ₹0</p>
+    <button id="checkout">PROCEED TO CHECKOUT</button>
+  </div>
+</div>
+
+  <!-- Comments Section -->
+<section class="comments-section">
+  <h2 class="section-title">COMMENTS</h2>
+  
+  <div class="comment-form">
+    <textarea id="comment-input" placeholder="thoughts..." rows="2"></textarea>
+    <div class="form-footer">
+      <div class="char-counter">0/250</div>
+      <button id="submit-comment" class="cyber-button">POST</button>
+    </div>
+  </div>
+
+  <div class="comments-container">
+    <!-- Comments will load here dynamically -->
+  </div>
+
+  <div class="comments-footer">
+    <button class="load-more-btn">Load More Comments</button>
+    <div class="login-prompt">
+      <p>Want to comment? 
+        <a href="login2.html" class="cyber-link">Login</a> or 
+        <a href="login2.html" class="cyber-link">Sign Up</a>
+      </p>
+    </div>
+  </div>
+</section>
+<!-- Cart Icon to Open the Cart Modal -->
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>SHOP</h3>
+        <div class="footer-links">
+          <a href="#">New Arrivals</a>
+          <a href="#">Best Sellers</a>
+          <a href="#">Bundles</a>
+        </div>
+      </div>
+      
+      <div class="footer-section">
+        <h3>SUPPORT</h3>
+        <div class="footer-links">
+          <a href="#">Contact</a>
+          <a href="#">FAQs</a>
+          <a href="#">Shipping</a>
+        </div>
+      </div>
+      
+      <div class="footer-section">
+        <h3>CONNECT</h3>
+        <div class="social-icons">
+          <a href="https://www.instagram.com/oi_ace__/" class="social-icon">📱</a>
+          <a href="#" class="social-icon">💻</a>
+          <a href="#" class="social-icon">🎮</a>
+          <a href="LEGEND0110w@GMAIL.COM" class="social-icon">📧</a>
+        </div>
+        <button id="logout">Log Out</button>
+      </div>
+    </div>
+    
+    <div class="copyright">
+      © 2025 CRYO_Byte_
+    </div>
+  </footer>
+
+    <!-- Script -->
+<!-- Other scripts -->
+
+<script src="script.js"></script>
+
+
+<!-- Modern Checkout Modal -->
+<div id="checkout-modal" class="modal">
+  <div class="checkout-modal-container">
+    <span class="close">&times;</span>
+
+    <!-- Header -->
+    <div class="checkout-header">
+      <h2>🛒 Secure Checkout</h2>
+      <p>Complete your order in a few easy steps</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="checkout-progress">
+      <div class="progress-step active" data-step="1">
+        <div class="step-number">1</div>
+        <div class="step-label">Shipping</div>
+      </div>
+      <div class="progress-step" data-step="2">
+        <div class="step-number">2</div>
+        <div class="step-label">Payment</div>
+      </div>
+      <div class="progress-step" data-step="3">
+        <div class="step-number">3</div>
+        <div class="step-label">Complete</div>
+      </div>
+    </div>
+
+    <!-- Checkout Steps -->
+    <div id="checkout-steps">
+      <!-- Step 1: Shipping -->
+      <div class="step active" id="step-1">
+        <h7>📦 Shipping Details</h7>
+        <form class="checkout-form">
+          <input type="text" placeholder="Full Name" required />
+          <input type="email" placeholder="Email" required />
+          <textarea placeholder="Address" rows="2" required></textarea>
+
+          <div class="form-row">
+            <input type="text" placeholder="City" required />
+            <input type="text" placeholder="ZIP Code" required />
+          </div>
+
+          <input type="tel" placeholder="Phone Number" required />
+
+          <div class="checkout-actions">
+            <button type="button" id="next-to-payment" class="btn-primary">Continue to Payment</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: Payment -->
+      <div class="step" id="step-2">
+        <h7>💳 Payment Method</h7>
+
+        <div class="payment-options">
+          <button id="rzp-button" class="rzp-pay-button">Pay with Razorpay 🔐</button>
+
+          <div class="cod-option">
+            <label><input type="checkbox" id="enable-cod" /> Cash on Delivery (+₹50)</label>
+          </div>
+        </div>
+
+        <div class="checkout-summary">
+          <h4>Order Summary</h4>
+          <div id="checkout-items">
+            <!-- Dynamically inserted -->
+          </div>
+          <div class="summary-line">
+            <span>Subtotal</span><span id="checkout-subtotal">₹0</span>
+          </div>
+          <div class="summary-line">
+            <span>Shipping</span><span id="checkout-shipping">Free</span>
+          </div>
+          <div class="summary-total">
+            <span>Total</span><span id="checkout-total-amount">₹0</span>
+          </div>
+        </div>
+
+        <div class="checkout-actions">
+          <button type="button" class="btn-secondary" id="back-to-shipping">Back</button>
+          <button type="button" class="btn-primary" id="place-cod-order" style="display:none;">Place Order</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div class="step" id="step-3">
+        <div class="confirmation-screen">
+          <div class="confirmation-icon">✅</div>
+          <h3>Order Placed!</h3>
+          <p>Thank you for shopping with SetupZone!</p>
+
+          <div class="confirmation-details">
+            <div><strong>Order ID:</strong> <span id="order-id-display">#123456</span></div>
+            <div><strong>Email:</strong> <span id="order-email-display">example@mail.com</span></div>
+            <div><strong>Delivery:</strong> <span id="order-delivery-display">3-5 Business Days</span></div>
+          </div>
+
+          <div class="confirmation-actions">
+            <button class="btn-primary" id="continue-shopping">Continue Shopping</button>
+            <button class="btn-outline" id="track-order">Track Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
