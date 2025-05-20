@@ -467,7 +467,7 @@ h6 {
   box-shadow: 
     0 8px 32px rgba(106, 17, 203, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-  max-width: 1200px;
+  max-width: 100%;
   flex-wrap: wrap;
 }
 
@@ -536,6 +536,7 @@ h6 {
 
 #suggestions li {
   padding: 0.8rem 1.5rem;
+
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -1444,6 +1445,7 @@ body.dark-mode #copyright{
 
 .comments-container {
   margin-top: 2rem;
+  max-width: 95%;
   /* Removed fixed height and overflow */
 }
 
@@ -3112,25 +3114,16 @@ body.dark-mode #comment-input {
     0 0 15px rgba(0, 251, 255, 0.1);
 }
 body.dark-mode .controls {
-  background-color: #111827; /* dark slate gray */
+  background-color: transparent; /* dark slate gray */
   border: 1px solid #00f0ff20;
-  color: #f0f0f0;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+  color: transparent;
+ 
   border-radius: 8px;
   padding: 10px;
   transition: all 0.3s ease;
 }
 
 /* Optional: dark styling for inputs inside */
-body.dark-mode .controls input{
-  background-color: #1f2937;
-  color: #00f0ff;
-  border: 1px solid #00f0ff30;
-  border-radius: 4px;
-  padding: 6px;
-  margin: 4px;
-  transition: 0.2s;
-}
 
 body.dark-mode #search-bar:focus,
 body.dark-mode .controls select:focus,
@@ -3350,5 +3343,36 @@ body.dark-mode .checkout-item-total {
 body.dark-mode .confirmation-details {
   background-color: #1f1f1f;
   border-color: #444;
-  color: #e0e0e0;
+  color: #f0f0f0;
 }
+body.dark-mode #particles { display: block; }
+body:not(.dark-mode) #particles { display: none; }
+
+/* Add to your style.css */
+#particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1; /* Behind all content */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+/* For dark mode */
+body.dark-mode #particles-js {
+  background: transparent;
+}
+
+#cosmic-ripples {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
