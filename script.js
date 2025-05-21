@@ -559,19 +559,19 @@ function setupCommentsSystem() {
   if (commentInput && submitComment && commentsContainer) {
     const commentsRef = database.ref('comments');
 
-    // Handle auth state
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // User is logged in
-        if (loginPrompt) loginPrompt.style.display = 'none';
-        commentInput.disabled = false;
-        loadComments();
-      } else {
-        // User is logged out
-        if (loginPrompt) loginPrompt.style.display = 'block';
-        commentInput.disabled = true;
-      }
-    });
+auth.onAuthStateChanged(user => {
+  if (user) {
+    if (loginPrompt) loginPrompt.style.display = 'none';
+    commentInput.disabled = false;
+  } else {
+    if (loginPrompt) loginPrompt.style.display = 'block';
+    commentInput.disabled = true;
+  }
+});
+
+// Always load comments, even if user is not logged in
+loadComments();
+
 
     // Submit comment
     submitComment.addEventListener('click', () => {
