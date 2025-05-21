@@ -96,6 +96,17 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggleButton) {
     toggleButton.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
+      // Inside your existing toggle function, after dark mode is applied:
+if (document.body.classList.contains("dark-mode")) {
+  darkModeSound.currentTime = 0.1;
+  darkModeSound.volume = 0.5;
+  darkModeSound.muted = false;
+
+  darkModeSound.play().catch(e => {
+    console.log("Autoplay blocked: ", e);
+  });
+}
+
       localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
     });
     
@@ -423,16 +434,6 @@ function setupOrderTracking() {
 
   const darkModeSound = document.getElementById("darkModeSound");
 
-// Inside your existing toggle function, after dark mode is applied:
-if (document.body.classList.contains("dark-mode")) {
-  darkModeSound.currentTime = 0.1;
-  darkModeSound.volume = 0.5;
-  darkModeSound.muted = false;
-
-  darkModeSound.play().catch(e => {
-    console.log("Autoplay blocked: ", e);
-  });
-}
 
 // Ensure it starts with "ORD-"
 if (!orderId.startsWith("ORD-")) {
