@@ -946,6 +946,7 @@ font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida San
   border-top: 1px dashed rgba(0, 0, 0, 0.341); /* Subtle divider */
 }
 
+
 body.dark-mode #copyright{
 
   border-top: white;
@@ -1948,10 +1949,16 @@ body.dark-mode #copyright{
   left: 0;
   top: 0;
   width: 100%;
+
   height: 100%;
   overflow: auto;
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(5px);
+}
+
+.checkout-content {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .checkout-modal-container {
@@ -1963,7 +1970,6 @@ body.dark-mode #copyright{
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   animation: modal-slide-in 0.3s ease-out;
   position: relative;
-  overflow: hidden;
 }
 
 @media (max-width: 768px) {
