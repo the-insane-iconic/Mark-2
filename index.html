@@ -3,587 +3,468 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="CRYO_BYTE - Enterprise Next-Gen Gaming Room Decor & Hardware Platform powered by edge caching and real-time live catalog updates." />
-  <title>CRYO_BYTE | Amazon-Grade Gaming Decor Platform</title>
+  <meta name="description" content="CRYO_BYTE AI OS - Next-Gen Gaming Decor Platform featuring natural language AI Search, real-time edge telemetry, and dual theme modes." />
+  <title>CRYO_BYTE | Premium AI OS Platform</title>
 
-  <!-- Google Fonts & Typography -->
+  <!-- Google Fonts: Inter, JetBrains Mono, Orbitron -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
-  <!-- Core Stylesheets -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Socket.io Client SDK -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
-<body class="dark-theme">
+<body class="dark-theme tracking-tight" id="app-body">
 
-  <!-- Top Announcement / Live Node Banner -->
-  <div class="top-banner">
-    <div class="banner-content">
-      <span class="pulse-dot"></span>
-      <span class="banner-text"><strong>AWS Edge Network Active:</strong> Sub-100ms Product Delivery & Real-Time Live Catalog Sync Engaged.</span>
+  <!-- Top System Telemetry Bar (AI OS Header Bar) -->
+  <div class="telemetry-bar">
+    <div class="telemetry-left">
+      <span class="live-dot-pulse"></span>
+      <span class="telemetry-text"><strong>AI OS Core:</strong> <code>v3.6-flash</code> &bull; Edge Region: <code>fra1-aws</code> &bull; Latency: <span id="telemetry-latency">12</span>ms &bull; Hit Ratio: <span class="accent-green-text">99.8%</span></span>
     </div>
+    <div class="telemetry-right">
+      <!-- Theme Switcher Button -->
+      <button id="theme-toggle-btn" class="theme-toggle-pill" title="Toggle Light / Dark AI OS Theme">
+        <span id="theme-icon">🌙</span> <span id="theme-label">Dark OS</span>
+      </button>
 
-    <!-- Prime Countdown & Currency Selector -->
-    <div class="banner-controls">
-      <!-- Currency Switcher -->
-      <select id="currency-select" class="currency-dropdown" aria-label="Select Currency">
+      <select id="currency-select" class="currency-pill" aria-label="Select Currency">
         <option value="INR" selected>🇮🇳 INR (₹)</option>
         <option value="USD">🇺🇸 USD ($)</option>
         <option value="EUR">🇪🇺 EUR (€)</option>
         <option value="GBP">🇬🇧 GBP (£)</option>
       </select>
-
-      <span id="live-indicator" class="live-badge" title="Live WebSockets Broadcaster connected">🟢 LIVE SYNC ONLINE</span>
-    </div>
-  </div>
-
-  <!-- Amazon-Style Prime Lightning Deals Banner -->
-  <div class="lightning-deal-bar">
-    <div class="deal-info">
-      <span class="deal-badge">⚡ PRIME LIGHTNING DEAL</span>
-      <span><strong>Cyber Gaming Desk & RGB LED Bundle</strong> - Up to 45% OFF</span>
-    </div>
-    <div class="deal-timer-box">
-      <span>Ends in:</span>
-      <span id="deal-timer-clock" class="timer-clock">03h 42m 19s</span>
+      
+      <span class="status-pill">AI SYNC ONLINE</span>
     </div>
   </div>
 
   <!-- Primary Navigation Header -->
-  <header class="site-header">
+  <header class="linear-header">
     <div class="header-container">
       
       <!-- Brand Logo -->
-      <a href="#" class="brand-logo" aria-label="CRYO_BYTE Home">
-        <span class="logo-icon">⚡</span>
-        <span class="logo-text">CRYO<span class="accent-text">_BYTE</span></span>
+      <a href="#" class="brand-logo">
+        <span class="brand-square">✨</span>
+        <span class="logo-title">CRYO<span class="logo-sub">_AI_OS</span></span>
       </a>
 
-      <!-- Instant Global Search Container -->
-      <div class="global-search-wrapper">
-        <div class="search-input-group">
-          <span class="search-icon">🔍</span>
-          <input 
-            type="text" 
-            id="global-search-input" 
-            placeholder="Search premium gaming desks, LED strips, acoustic panels..." 
-            autocomplete="off"
-            aria-label="Search products"
-          />
-          <button id="clear-search-btn" class="clear-btn hidden" aria-label="Clear search">&times;</button>
-        </div>
+      <!-- Command Palette Style Search Box -->
+      <div class="command-search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="global-search-input" 
+          placeholder="Search products or type ⌘K..." 
+          autocomplete="off"
+          aria-label="Global product search"
+        />
+        <kbd class="kbd-shortcut">⌘K</kbd>
 
-        <!-- Instant Auto-Suggest Dropdown -->
         <div id="search-suggestions-dropdown" class="search-dropdown hidden">
-          <div class="dropdown-header">Recent & Popular Searches</div>
-          <div id="recent-search-tags" class="search-tags">
-            <!-- Dynamically populated tags -->
-          </div>
-          <div class="dropdown-divider"></div>
-          <ul id="suggestions-list" class="suggestions-list">
-            <!-- Dynamically populated suggestions -->
-          </ul>
+          <div class="dropdown-header">Recent Searches</div>
+          <div id="recent-search-tags" class="search-tags"></div>
+          <ul id="suggestions-list" class="suggestions-list"></ul>
         </div>
       </div>
 
-      <!-- Header Action Buttons -->
+      <!-- System Action Buttons -->
       <div class="header-actions">
-        <!-- Admin Console Toggle -->
-        <button id="admin-console-toggle" class="header-btn btn-admin" title="Open Real-Time Admin Panel">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-label">Admin Live Console</span>
+        <button id="admin-console-toggle" class="btn-linear btn-admin" title="Admin Control Console">
+          <span class="btn-dot"></span> Admin Console
         </button>
 
-        <!-- Track Order -->
-        <button id="track-order-btn" class="header-btn" title="Track Existing Order">
-          <span class="btn-icon">📦</span>
-          <span class="btn-label">Track Order</span>
+        <button id="track-order-btn" class="btn-linear" title="Order Tracking">
+          <span>📦 Track</span>
         </button>
 
-        <!-- Wishlist -->
-        <button id="wishlist-btn" class="header-btn icon-only" title="View Wishlist">
-          <span class="btn-icon">❤️</span>
-          <span id="wishlist-count" class="badge">0</span>
+        <button id="wishlist-btn" class="btn-linear icon-only" title="Wishlist">
+          <span>❤️</span>
+          <span id="wishlist-count" class="badge-count">0</span>
         </button>
 
-        <!-- Shopping Cart Drawer Trigger -->
-        <button id="cart-drawer-trigger" class="header-btn btn-cart" title="View Shopping Cart">
-          <span class="btn-icon">🛒</span>
-          <span class="btn-label">Cart</span>
-          <span id="cart-badge-count" class="cart-badge">0</span>
+        <button id="cart-drawer-trigger" class="btn-linear btn-accent" title="Shopping Cart">
+          <span>🛒 Cart</span>
+          <span id="cart-badge-count" class="badge-count accent">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Platform Layout Container -->
+  <!-- Main AI OS Platform Layout -->
   <main class="platform-layout">
-    
-    <!-- Left Column: Dynamic Multi-Faceted Filter Sidebar -->
-    <aside class="filter-sidebar" id="filter-sidebar">
-      <div class="sidebar-header">
-        <h3><span class="icon">🎛️</span> Catalog Filters</h3>
-        <button id="reset-filters-btn" class="btn-text-link">Reset All</button>
-      </div>
 
-      <!-- Amazon Prime Filter -->
-      <div class="filter-group">
-        <label class="toggle-switch">
-          <input type="checkbox" id="prime-only-toggle" checked />
-          <span class="slider round"></span>
-          <span class="toggle-label"><strong style="color:var(--accent-cyan)">Prime</strong> Free Next-Day Delivery</span>
-        </label>
+    <!-- Interactive Natural Language AI Assistant Prompt Bar -->
+    <section class="ai-prompt-bar-card">
+      <div class="ai-prompt-header">
+        <span class="ai-sparkle-icon">✨</span>
+        <span class="ai-prompt-title">AI Natural Language Assistant</span>
+        <span class="ai-tag">Gemini 3.6 Powered</span>
       </div>
-
-      <!-- Categories Filter -->
-      <div class="filter-group">
-        <h4 class="filter-title">Categories</h4>
-        <div class="checkbox-list">
-          <label class="custom-checkbox">
-            <input type="checkbox" name="category" value="lighting" checked />
-            <span class="checkmark"></span>
-            <span class="label-text">RGB Lighting (4)</span>
-          </label>
-          <label class="custom-checkbox">
-            <input type="checkbox" name="category" value="furniture" checked />
-            <span class="checkmark"></span>
-            <span class="label-text">Gaming Furniture (5)</span>
-          </label>
-          <label class="custom-checkbox">
-            <input type="checkbox" name="category" value="posters" checked />
-            <span class="checkmark"></span>
-            <span class="label-text">Wall Decor & Art (3)</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Dual Range Price Filter -->
-      <div class="filter-group">
-        <div class="filter-title-row">
-          <h4 class="filter-title">Max Price</h4>
-          <span id="price-range-value" class="price-val">₹20,000</span>
-        </div>
+      <div class="ai-prompt-input-group">
         <input 
-          type="range" 
-          id="price-range-slider" 
-          min="500" 
-          max="20000" 
-          step="500" 
-          value="20000"
-          aria-label="Price range filter"
+          type="text" 
+          id="ai-prompt-input" 
+          placeholder="Ask AI: e.g. 'Show me ergonomic gaming desks under ₹8,000' or 'RGB lights with 4.8+ rating'..." 
+          aria-label="Ask AI Assistant"
         />
-        <div class="range-bounds">
-          <span>₹500</span>
-          <span>₹20,000</span>
-        </div>
+        <button id="ai-prompt-submit-btn" class="btn-accent-glow">Ask AI ⚡</button>
       </div>
-
-      <!-- Stock Availability Toggle -->
-      <div class="filter-group">
-        <label class="toggle-switch">
-          <input type="checkbox" id="in-stock-only-toggle" />
-          <span class="slider round"></span>
-          <span class="toggle-label">In-Stock Items Only</span>
-        </label>
+      <div class="ai-chip-suggestions">
+        <span class="chip-label">Try asking:</span>
+        <button class="ai-chip" onclick="applyAiPrompt('RGB lighting under ₹3,000')">"RGB lighting under ₹3,000"</button>
+        <button class="ai-chip" onclick="applyAiPrompt('Highest rated gaming furniture')">"Highest rated furniture"</button>
+        <button class="ai-chip" onclick="applyAiPrompt('In stock acoustic wall panels')">"In stock acoustic panels"</button>
       </div>
-
-      <!-- Minimum Rating Filter -->
-      <div class="filter-group">
-        <h4 class="filter-title">Customer Rating</h4>
-        <div class="radio-list">
-          <label class="custom-radio">
-            <input type="radio" name="rating-filter" value="0" checked />
-            <span class="radio-mark"></span>
-            <span>All Ratings</span>
-          </label>
-          <label class="custom-radio">
-            <input type="radio" name="rating-filter" value="4.5" />
-            <span class="radio-mark"></span>
-            <span>4.5★ & Above</span>
-          </label>
-          <label class="custom-radio">
-            <input type="radio" name="rating-filter" value="4.7" />
-            <span class="radio-mark"></span>
-            <span>4.7★ & Above</span>
-          </label>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Right Column: Catalog Grid & Controls -->
-    <section class="catalog-content">
+    </section>
+    
+    <!-- Hero Asymmetric Bento Grid Section (AI OS Windows) -->
+    <section class="bento-hero-grid">
       
-      <!-- Catalog Controls Header -->
-      <div class="catalog-toolbar">
-        <div class="toolbar-info">
-          <h1 class="page-heading">Gaming Setup Decor Catalog</h1>
-          <span id="results-count" class="results-count">Showing 12 items</span>
+      <!-- Bento Box 1: Featured Spotlight Window (Spans 2 cols, 2 rows) -->
+      <div class="bento-card hero-spotlight-card">
+        <!-- AI OS Window Header -->
+        <div class="os-window-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="window-title">featured_spotlight.sys</span>
         </div>
 
-        <div class="toolbar-sort">
-          <label for="sort-select">Sort by:</label>
-          <select id="sort-select" class="custom-select">
-            <option value="featured">Featured / Best Match</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Highest Customer Rating</option>
-          </select>
+        <div class="bento-badge-row mt-10">
+          <span class="bento-pill accent">SPOTLIGHT</span>
+          <span class="bento-pill">99.4% Match</span>
+        </div>
+
+        <div class="spotlight-content">
+          <div class="spotlight-media">
+            <img id="spotlight-img" src="https://foyr.com/learn/wp-content/uploads/2019/01/lighting-for-gaming-room-scaled.jpg" alt="Featured Product" />
+          </div>
+          <div class="spotlight-info">
+            <h2 id="spotlight-title" class="spotlight-heading">RGB Ambient LED Strip Pro</h2>
+            <p id="spotlight-desc" class="spotlight-sub">16-Million color music-sync smart LED strip with high-density light beads & ultra-fast response time.</p>
+            
+            <div class="spotlight-price-row">
+              <span id="spotlight-price" class="hero-price">₹1,999</span>
+              <span class="hero-old-price">₹2,999</span>
+              <span class="discount-badge">33% OFF</span>
+            </div>
+
+            <div class="spotlight-actions">
+              <button class="btn-accent-glow" onclick="oneClickBuyNow('p1')">
+                <span>⚡ Buy Now (1-Click)</span>
+              </button>
+              <button class="btn-glass" onclick="openProductModal('p1')">
+                <span>Inspect Details</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Active Filter Pills Bar -->
-      <div id="active-filters-bar" class="active-filters-bar hidden">
-        <span class="active-label">Active Filters:</span>
-        <div id="active-pills-container" class="pills-container"></div>
-      </div>
-
-      <!-- Products Grid -->
-      <div id="product-grid" class="product-grid">
-        <!-- Skeleton loaders rendered by default -->
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-      </div>
-
-      <!-- Item-to-Item Collaborative Recommendation Engine Carousel -->
-      <section class="recommendations-section">
-        <div class="section-header">
-          <h2><span class="icon">🤖</span> Amazon-Grade Item Affinity Matrix</h2>
-          <p class="section-subtitle">Recommended for your active session context using real-time co-occurrence vectors</p>
+      <!-- Bento Box 2: Telemetry Metric Window -->
+      <div class="bento-card telemetry-metric-card">
+        <div class="os-window-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="window-title">edge_latency.log</span>
         </div>
-        <div id="recommendations-carousel" class="recommendations-carousel">
-          <!-- Dynamically populated recommendations -->
+
+        <div class="metric-number"><span id="telemetry-latency-val">12</span><span class="unit">ms</span></div>
+        <div class="metric-desc">Sub-100ms API response time globally across Cloudflare edge workers.</div>
+        <div class="sparkline-bar">
+          <div class="spark-bar" style="height:40%"></div>
+          <div class="spark-bar" style="height:65%"></div>
+          <div class="spark-bar" style="height:85%"></div>
+          <div class="spark-bar" style="height:100%"></div>
+          <div class="spark-bar" style="height:70%"></div>
+          <div class="spark-bar" style="height:90%"></div>
+        </div>
+      </div>
+
+      <!-- Bento Box 3: Lightning Deal Flash Sale Window -->
+      <div class="bento-card flash-deal-card">
+        <div class="os-window-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="window-title">flash_deal.exe</span>
+        </div>
+
+        <div class="flash-product-info">
+          <div class="flex-between">
+            <span class="card-label text-magenta">PRIME FLASH</span>
+            <span id="deal-timer-clock" class="deal-clock">03h 42m 19s</span>
+          </div>
+          <h4 class="mt-8">Cyber Desk & RGB Bundle</h4>
+          <div class="claim-progress-box mt-10">
+            <div class="progress-labels">
+              <span>Claimed: 78%</span>
+              <span>Only 5 left!</span>
+            </div>
+            <div class="progress-track-sm">
+              <div class="progress-fill-magenta" style="width: 78%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Box 4: AI Recommendation Matrix Window (Spans 2 cols) -->
+      <div class="bento-card affinity-matrix-card">
+        <div class="os-window-header">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="window-title">recommendation_matrix.ai</span>
+        </div>
+
+        <div id="recommendations-carousel" class="bento-affinity-carousel">
+          <!-- Dynamically injected -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Catalog Section with Sidebar Filters & Grid -->
+    <div class="catalog-section">
+      
+      <!-- Left Column: Filters Sidebar -->
+      <aside class="filter-sidebar">
+        <div class="sidebar-header">
+          <h3>Filters</h3>
+          <button id="reset-filters-btn" class="reset-link">Reset</button>
+        </div>
+
+        <!-- Categories -->
+        <div class="filter-group">
+          <label class="group-title">Categories</label>
+          <div class="checkbox-list">
+            <label class="custom-check-pill">
+              <input type="checkbox" name="category" value="lighting" checked />
+              <span class="check-box"></span>
+              <span>RGB Lighting</span>
+            </label>
+            <label class="custom-check-pill">
+              <input type="checkbox" name="category" value="furniture" checked />
+              <span class="check-box"></span>
+              <span>Gaming Furniture</span>
+            </label>
+            <label class="custom-check-pill">
+              <input type="checkbox" name="category" value="posters" checked />
+              <span class="check-box"></span>
+              <span>Wall Art</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Max Price Slider -->
+        <div class="filter-group">
+          <div class="flex-between">
+            <label class="group-title">Max Price</label>
+            <span id="price-range-value" class="price-pill-val">₹20,000</span>
+          </div>
+          <input type="range" id="price-range-slider" min="500" max="20000" step="500" value="20000" aria-label="Max Price Slider" />
+        </div>
+
+        <!-- In-Stock Toggle -->
+        <div class="filter-group">
+          <label class="toggle-row">
+            <input type="checkbox" id="in-stock-only-toggle" />
+            <span class="toggle-track"></span>
+            <span class="toggle-text">In-Stock Only</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- Right Column: Products Grid -->
+      <section class="catalog-grid-wrapper">
+        <div class="catalog-toolbar">
+          <span id="results-count" class="results-badge">Showing 10 products</span>
+          
+          <div class="sort-selector">
+            <span>Sort:</span>
+            <select id="sort-select" class="linear-select" aria-label="Sort catalog">
+              <option value="featured">Featured Match</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Product Cards Grid -->
+        <div id="product-grid" class="bento-product-grid">
+          <div class="skeleton-bento"></div>
+          <div class="skeleton-bento"></div>
+          <div class="skeleton-bento"></div>
+          <div class="skeleton-bento"></div>
         </div>
       </section>
 
-    </section>
+    </div>
   </main>
 
   <!-- ========================================================================= -->
-  <!-- MODALS & DRAWERS SYSTEM -->
+  <!-- MODALS SYSTEM (Product Detail, Cart Drawer, Checkout, Admin) -->
   <!-- ========================================================================= -->
 
-  <!-- 1. Interactive Product Detail Modal (With 1-Click Buy Now & Bundle Builder) -->
+  <!-- Product Modal -->
   <div id="product-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-    <div class="modal-card product-detail-card">
-      <button class="modal-close-btn" id="product-modal-close">&times;</button>
+    <div class="modal-card-linear">
+      <div class="os-window-header modal-header-bar">
+        <div class="window-dots">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <span class="window-title">product_inspector.sys</span>
+        <button class="modal-close" id="product-modal-close" aria-label="Close modal">&times;</button>
+      </div>
       
-      <div class="product-modal-grid">
-        <!-- Gallery Side -->
-        <div class="gallery-column">
-          <div class="main-image-container" id="zoom-container">
-            <img id="modal-main-image" src="" alt="Product view" />
-          </div>
-          <div id="modal-thumbnails" class="thumbnail-strip">
-            <!-- Thumbnails -->
-          </div>
-
-          <!-- Amazon Prime Guarantee Badge -->
-          <div class="prime-guarantee-box">
-            <span class="prime-logo"><strong>prime</strong></span>
-            <div class="guarantee-text">
-              <span><strong>FREE Delivery Tomorrow</strong> if ordered within</span>
-              <span id="prime-order-countdown" class="prime-countdown">02h 48m 15s</span>
-            </div>
-          </div>
+      <div class="product-modal-bento">
+        <div class="modal-media-box">
+          <img id="modal-main-image" src="" alt="Product View" />
+          <div id="modal-thumbnails" class="modal-thumbs"></div>
         </div>
 
-        <!-- Info Side -->
-        <div class="info-column">
-          <div class="badge-row">
-            <span id="modal-category-badge" class="cat-badge">Lighting</span>
-            <span id="modal-stock-badge" class="stock-badge in-stock">In Stock</span>
+        <div class="modal-info-box">
+          <div class="modal-badge-row">
+            <span id="modal-category-badge" class="bento-pill">Category</span>
+            <span id="modal-stock-badge" class="bento-pill green">In Stock</span>
           </div>
 
-          <h2 id="modal-title" class="product-title">Product Title</h2>
-          
-          <div class="rating-row">
-            <span id="modal-rating-stars" class="stars">★★★★★</span>
-            <span id="modal-rating-val" class="rating-val">4.9</span>
-            <span class="rating-count">(128 verified reviews)</span>
+          <h2 id="modal-title" class="modal-product-title">Product Title</h2>
+
+          <div class="modal-price-row">
+            <span id="modal-price" class="modal-price-val">₹0</span>
+            <span id="modal-old-price" class="modal-old-val">₹0</span>
           </div>
 
-          <div class="price-row">
-            <span id="modal-price" class="current-price">₹0</span>
-            <span id="modal-old-price" class="old-price">₹0</span>
-            <span id="modal-discount-badge" class="discount-tag">20% OFF</span>
-          </div>
+          <p id="modal-description" class="modal-desc">Description</p>
 
-          <p id="modal-description" class="product-description">Description text here...</p>
-
-          <!-- Amazon-Style "Frequently Bought Together" Bundle Builder -->
-          <div class="bundle-builder-box">
-            <h4 class="bundle-title">📦 Frequently Bought Together</h4>
-            <div id="bundle-items-list" class="bundle-items-list">
-              <!-- Dynamically populated bundle items -->
-            </div>
-            <div class="bundle-total-row">
-              <span>Total Bundle Price: <strong id="bundle-total-price">₹0</strong></span>
-              <button id="add-bundle-btn" class="btn-primary btn-sm">Add All to Cart 🛒</button>
+          <!-- Frequently Bought Together Bundle -->
+          <div class="bundle-box-linear">
+            <h4>📦 Frequently Bought Together</h4>
+            <div id="bundle-items-list" class="bundle-list"></div>
+            <div class="bundle-footer">
+              <span>Total Bundle: <strong id="bundle-total-price">₹0</strong></span>
+              <button id="add-bundle-btn" class="btn-accent-sm">Add Bundle to Cart 🛒</button>
             </div>
           </div>
 
-          <div class="specs-box">
-            <h4>Highlights & Specifications</h4>
-            <ul id="modal-specs-list">
-              <li>High durability materials</li>
-              <li>Plug and Play setup</li>
-              <li>1 Year Cryo_BYTE Warranty</li>
-            </ul>
+          <div class="modal-actions-grid">
+            <button id="modal-add-cart-btn" class="btn-linear full">🛒 Add to Cart</button>
+            <button id="modal-one-click-btn" class="btn-accent-glow full">⚡ Buy Now (1-Click)</button>
           </div>
-
-          <!-- Amazon 1-Click Ordering CTA Buttons -->
-          <div class="modal-cta-row">
-            <button id="modal-add-cart-btn" class="btn-primary full-width">
-              <span>🛒 Add to Cart</span>
-            </button>
-            <button id="modal-one-click-btn" class="btn-one-click full-width">
-              <span>⚡ Buy Now (1-Click)</span>
-            </button>
-          </div>
-
-          <!-- Customer Review Distribution Breakdown -->
-          <div class="reviews-breakdown-box">
-            <h4>Customer Reviews Breakdown</h4>
-            <div class="rating-bars">
-              <div class="rating-bar-row">
-                <span>5★</span>
-                <div class="bar-track"><div class="bar-fill" style="width: 78%;"></div></div>
-                <span>78%</span>
-              </div>
-              <div class="rating-bar-row">
-                <span>4★</span>
-                <div class="bar-track"><div class="bar-fill" style="width: 16%;"></div></div>
-                <span>16%</span>
-              </div>
-              <div class="rating-bar-row">
-                <span>3★</span>
-                <div class="bar-track"><div class="bar-fill" style="width: 4%;"></div></div>
-                <span>4%</span>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. Shopping Cart Slide-Over Drawer -->
+  <!-- Cart Slide Drawer -->
   <div id="cart-drawer-overlay" class="drawer-overlay hidden">
-    <div class="cart-drawer">
+    <div class="cart-drawer-linear">
       <div class="drawer-header">
         <h3>Shopping Cart (<span id="cart-items-count">0</span>)</h3>
-        <button id="cart-drawer-close" class="close-drawer-btn">&times;</button>
+        <button id="cart-drawer-close" class="close-drawer" aria-label="Close cart">&times;</button>
       </div>
 
-      <div class="free-shipping-bar">
-        <p id="shipping-progress-text">Add ₹1,000 more for Free Next-Day Delivery!</p>
-        <div class="progress-track">
-          <div id="shipping-progress-fill" class="progress-fill" style="width: 60%;"></div>
-        </div>
-      </div>
+      <div id="cart-items-list" class="cart-items-scroll"></div>
 
-      <div id="cart-items-list" class="cart-items-list">
-        <!-- Cart items -->
-      </div>
-
-      <div class="drawer-footer">
-        <div class="summary-line">
-          <span>Subtotal</span>
-          <span id="cart-subtotal">₹0</span>
-        </div>
-        <div class="summary-line">
-          <span>Estimated Taxes & Shipping</span>
-          <span class="free-text">FREE</span>
-        </div>
-        <div class="summary-line total-line">
-          <span>Total</span>
-          <span id="cart-grand-total">₹0</span>
-        </div>
-
-        <button id="checkout-trigger-btn" class="btn-primary full-width btn-glow">
-          <span>Proceed to Checkout ➔</span>
-        </button>
+      <div class="drawer-footer-linear">
+        <div class="summary-row"><span>Total</span><strong id="cart-grand-total">₹0</strong></div>
+        <button id="checkout-trigger-btn" class="btn-accent-glow full">Proceed to Checkout ➔</button>
       </div>
     </div>
   </div>
 
-  <!-- 3. Frictionless Multi-Step Checkout Modal -->
+  <!-- Checkout Modal -->
   <div id="checkout-modal" class="modal-overlay hidden" role="dialog">
-    <div class="modal-card checkout-card">
-      <button class="modal-close-btn" id="checkout-modal-close">&times;</button>
+    <div class="modal-card-linear">
+      <button class="modal-close" id="checkout-modal-close" aria-label="Close checkout">&times;</button>
 
-      <div class="checkout-header">
-        <h2>Frictionless Checkout</h2>
-        <div class="checkout-steps-indicator">
-          <div class="step active" id="step-ind-1">1. Shipping</div>
-          <div class="step" id="step-ind-2">2. Payment</div>
-          <div class="step" id="step-ind-3">3. Confirmation</div>
+      <div class="checkout-steps-bar">
+        <div class="step-pill active" id="step-ind-1">1. Shipping</div>
+        <div class="step-pill" id="step-ind-2">2. Payment</div>
+        <div class="step-pill" id="step-ind-3">3. Receipt</div>
+      </div>
+
+      <div id="checkout-step-1" class="step-box">
+        <h3>Shipping Details</h3>
+        <div class="form-grid">
+          <input type="text" id="ship-name" placeholder="Full Name" value="Alex Morgan" class="linear-input" />
+          <input type="email" id="ship-email" placeholder="Email" value="alex@cryobyte.com" class="linear-input" />
+          <input type="text" id="ship-address" placeholder="Address" value="742 Cyberpunk Ave" class="linear-input full" />
+        </div>
+        <button type="button" id="to-step-2-btn" class="btn-accent-glow full mt-16">Continue to Payment ➔</button>
+      </div>
+
+      <div id="checkout-step-2" class="step-box hidden">
+        <h3>Payment Selection</h3>
+        <div class="payment-card-linear">
+          <strong>Instant Razorpay Gateway (Simulated)</strong>
+          <span>Cards, UPI, NetBanking</span>
+        </div>
+        <div class="flex-between mt-16">
+          <button type="button" id="back-to-step-1-btn" class="btn-linear">← Back</button>
+          <button type="button" id="place-order-btn" class="btn-accent-glow">Pay & Place Order ⚡</button>
         </div>
       </div>
 
-      <!-- Step 1: Shipping Form -->
-      <div id="checkout-step-1" class="checkout-step-content">
-        <h3>Shipping Address & Contact</h3>
-        <form id="shipping-form" onsubmit="event.preventDefault();">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ship-name">Full Name</label>
-              <input type="text" id="ship-name" placeholder="Alex Morgan" required value="Alex Morgan" />
-            </div>
-            <div class="form-group">
-              <label for="ship-email">Email Address</label>
-              <input type="email" id="ship-email" placeholder="alex@example.com" required value="alex@cryobyte.com" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="ship-address">Street Address</label>
-            <input type="text" id="ship-address" placeholder="742 Cyberpunk Ave" required value="742 Cyberpunk Ave" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="ship-city">City</label>
-              <input type="text" id="ship-city" placeholder="Bengaluru" required value="Bengaluru" />
-            </div>
-            <div class="form-group">
-              <label for="ship-zip">ZIP Code</label>
-              <input type="text" id="ship-zip" placeholder="560001" required value="560001" />
-            </div>
-          </div>
-          <button type="button" id="to-step-2-btn" class="btn-primary full-width">Continue to Payment ➔</button>
-        </form>
+      <div id="checkout-step-3" class="step-box hidden text-center">
+        <div class="success-icon-lg">🎉</div>
+        <h3>Order Placed Successfully!</h3>
+        <p>Order ID: <strong id="confirmed-order-id">#CB-98214</strong></p>
+        <button id="track-this-order-btn" class="btn-accent-glow mt-16">Track Order Real-Time 📦</button>
       </div>
-
-      <!-- Step 2: Payment Selection -->
-      <div id="checkout-step-2" class="checkout-step-content hidden">
-        <h3>Select Payment Method</h3>
-        <div class="payment-options">
-          <label class="payment-card selected">
-            <input type="radio" name="payment-method" value="razorpay" checked />
-            <div class="payment-info">
-              <strong>Instant Razorpay Gateway (Simulated)</strong>
-              <span>Cards, UPI, NetBanking, Instant Refund Shield</span>
-            </div>
-          </label>
-          <label class="payment-card">
-            <input type="radio" name="payment-method" value="cod" />
-            <div class="payment-info">
-              <strong>Pay on Delivery</strong>
-              <span>Pay via Cash/UPI upon delivery</span>
-            </div>
-          </label>
-        </div>
-
-        <div class="checkout-summary-box">
-          <div class="summary-line">
-            <span>Order Total:</span>
-            <strong id="checkout-total-val">₹0</strong>
-          </div>
-        </div>
-
-        <div class="step-actions">
-          <button type="button" id="back-to-step-1-btn" class="btn-secondary">← Back</button>
-          <button type="button" id="place-order-btn" class="btn-primary">Complete Purchase & Pay ⚡</button>
-        </div>
-      </div>
-
-      <!-- Step 3: Success Confirmation -->
-      <div id="checkout-step-3" class="checkout-step-content hidden">
-        <div class="success-screen">
-          <div class="success-icon">🎉</div>
-          <h3>Order Successfully Placed!</h3>
-          <p>Order ID: <strong id="confirmed-order-id">#CB-98214</strong></p>
-          <p class="success-sub">A tracking code has been dispatched to your email address.</p>
-          
-          <button id="track-this-order-btn" class="btn-primary">Track Order Real-Time 📦</button>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- 4. Order Tracking Modal -->
+  <!-- Order Tracking Modal -->
   <div id="tracking-modal" class="modal-overlay hidden" role="dialog">
-    <div class="modal-card tracking-card">
-      <button class="modal-close-btn" id="tracking-modal-close">&times;</button>
-      
+    <div class="modal-card-linear">
+      <button class="modal-close" id="tracking-modal-close" aria-label="Close tracking">&times;</button>
       <h2>Real-Time Order Tracking</h2>
-      <div class="tracking-search-bar">
-        <input type="text" id="tracking-input-id" placeholder="Enter Order ID (e.g. #CB-98214)" value="#CB-98214" />
-        <button id="search-tracking-btn" class="btn-primary">Search</button>
+      <div class="search-input-group mt-16">
+        <input type="text" id="tracking-input-id" value="#CB-98214" class="linear-input" />
       </div>
-
-      <div id="tracking-timeline-box" class="tracking-result-box">
-        <div class="timeline-status-bar">
-          <div class="timeline-step completed">
-            <div class="step-icon">📦</div>
-            <div class="step-text">Placed</div>
-            <div class="step-date">Today, 10:00 AM</div>
-          </div>
-          <div class="timeline-step completed">
-            <div class="step-icon">🏭</div>
-            <div class="step-text">Processed</div>
-            <div class="step-date">Today, 10:15 AM</div>
-          </div>
-          <div class="timeline-step active">
-            <div class="step-icon">🚚</div>
-            <div class="step-text">In Transit</div>
-            <div class="step-date">Estimated Tomorrow</div>
-          </div>
-          <div class="timeline-step">
-            <div class="step-icon">🏡</div>
-            <div class="step-text">Delivered</div>
-            <div class="step-date">Pending</div>
-          </div>
-        </div>
-
-        <div class="carrier-details-box">
-          <p><strong>Carrier:</strong> FedEx CyberExpress</p>
-          <p><strong>Tracking #:</strong> FX-9812739128</p>
-          <p><strong>Current Node:</strong> Node 4 - Regional Hub</p>
-        </div>
+      <div class="timeline-bar-linear mt-16">
+        <div class="t-step active">Placed</div>
+        <div class="t-step active">Processing</div>
+        <div class="t-step active">In Transit</div>
+        <div class="t-step">Delivered</div>
       </div>
     </div>
   </div>
 
-  <!-- 5. Real-Time Admin Panel Modal -->
+  <!-- Admin Panel Modal -->
   <div id="admin-modal" class="modal-overlay hidden" role="dialog">
-    <div class="modal-card admin-card">
-      <div class="admin-header">
-        <h2>⚡ Real-Time Admin Management Console</h2>
-        <span class="admin-badge">Publishing Engine Active</span>
-        <button class="modal-close-btn" id="admin-modal-close">&times;</button>
-      </div>
-
-      <p class="admin-subtitle">Modify prices, stock, or metadata below and click <strong>"PUBLISH LIVE"</strong> to immediately broadcast catalog updates to all active visitor sessions without page refreshes.</p>
-
-      <div class="admin-catalog-table-wrapper">
-        <table class="admin-table">
+    <div class="modal-card-linear wide">
+      <button class="modal-close" id="admin-modal-close" aria-label="Close admin">&times;</button>
+      <h2>⚡ Real-Time Admin Console</h2>
+      <p class="sub-text">Modify catalog items and click "Publish Live" to broadcast instantly to all open tabs.</p>
+      
+      <div class="table-wrapper-linear mt-16">
+        <table class="admin-table-linear">
           <thead>
-            <tr>
-              <th>SKU</th>
-              <th>Product Title</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Actions</th>
-            </tr>
+            <tr><th>SKU</th><th>Title</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr>
           </thead>
-          <tbody id="admin-table-body">
-            <!-- Admin rows -->
-          </tbody>
+          <tbody id="admin-table-body"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Stack -->
-  <div id="toast-container" class="toast-container"></div>
+  <div id="toast-container" class="toast-stack"></div>
 
   <script src="script.js"></script>
 </body>

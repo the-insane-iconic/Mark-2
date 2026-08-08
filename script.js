@@ -1,12 +1,10 @@
 /**
- * CRYO_BYTE Enterprise E-Commerce Client Engine
- * Features: Sub-100ms Rendering, Real-Time Live Sync Broadcast, 
- * Item-to-Item Collaborative Filtering Recommendation Engine, 
- * Multi-Currency Switcher, 1-Click Buy Now, Frequently Bought Together Bundle Builder,
- * and Prime Delivery Countdown Timers.
+ * CRYO_BYTE AI OS Client Engine
+ * Features: AI Natural Language Assistant Bar, Dual Theme System (Obsidian/Quartz),
+ * Asymmetric Bento Grid Controls, 1-Click Buy Now, and Real-Time Multi-Tab Sync.
  */
 
-// Currency Conversion Matrix (Base: INR ₹)
+// Currency Conversion Engine
 const CURRENCIES = {
   INR: { symbol: '₹', rate: 1.0 },
   USD: { symbol: '$', rate: 0.012 },
@@ -19,14 +17,13 @@ let currentCurrency = 'INR';
 function formatPrice(priceInINR) {
   const curr = CURRENCIES[currentCurrency] || CURRENCIES.INR;
   const converted = priceInINR * curr.rate;
-  
   if (currentCurrency === 'INR') {
     return `${curr.symbol}${Math.round(converted).toLocaleString('en-IN')}`;
   }
   return `${curr.symbol}${converted.toFixed(2)}`;
 }
 
-// Initial Product Datastore
+// Initial Catalog Datastore
 const INITIAL_PRODUCTS = [
   {
     id: "p1",
@@ -139,34 +136,6 @@ const INITIAL_PRODUCTS = [
     image: "https://images-cdn.ubuy.co.in/66f1469f4206364186049347-gaming-floating-shelves-with-lights-led.jpg",
     description: "Heavy duty wall floating shelf pair with embedded under-shelf LED strip for collectibles.",
     specs: ["Holds up to 25 lbs", "Under-shelf RGB Strip", "Concealed Wall Anchors", "Solid Hardwood"]
-  },
-  {
-    id: "p9",
-    sku: "RUG-909",
-    title: "Anti-Slip Gaming Zone Rug",
-    category: "furniture",
-    price: 4999,
-    discount_price: 3999,
-    stock: 22,
-    rating: 4.6,
-    rating_count: 78,
-    image: "https://images-cdn.ubuy.co.in/64494581a47132191378bd25-large-video-gaming-area-rug-for.jpg",
-    description: "5x7 Feet ultra-smooth carpet for chair rolling noise reduction and floor protection.",
-    specs: ["5x7 Feet Footprint", "Noise Dampening Pile", "Non-Slip Rubber Bottom", "Machine Washable"]
-  },
-  {
-    id: "p10",
-    sku: "METAL-1010",
-    title: "Laser-Cut Metal Art Print",
-    category: "posters",
-    price: 2499,
-    discount_price: 1999,
-    stock: 31,
-    rating: 4.9,
-    rating_count: 145,
-    image: "https://portrilux.com/cdn/shop/articles/Portrilux_Metal_Prints_1200x1200_6e066b39-0dd6-4064-a62a-ed3631d519c0.webp?v=1681851705",
-    description: "Industrial grade aluminum wall art plate with magnetic mounting system.",
-    specs: ["Rust-Proof Aluminum", "Easy Magnetic Mount", "Vibrant Gloss Finish", "Lifetime Color Guarantee"]
   }
 ];
 
@@ -250,7 +219,7 @@ class LiveSyncEngine {
 
 const liveSync = new LiveSyncEngine();
 
-// Collaborative Filtering Engine
+// Collaborative Recommendation Engine
 class RecommendationEngine {
   static getRecommendations(currentProductId, limit = 4) {
     const affinityList = ITEM_AFFINITY_MATRIX[currentProductId] || [];
@@ -275,18 +244,64 @@ class RecommendationEngine {
     container.innerHTML = recs.map(item => `
       <div class="rec-card" onclick="openProductModal('${item.id}')">
         <img src="${item.image}" alt="${item.title}" />
-        <span class="affinity-score">⚡ 94% Session Match</span>
-        <h4 class="card-title" style="font-size:0.85rem">${item.title}</h4>
-        <span class="price-current" style="font-size:0.95rem">${formatPrice(item.discount_price)}</span>
+        <span class="affinity-score">⚡ 94% Vector Match</span>
+        <h4 class="card-title" style="font-size:0.8rem">${item.title}</h4>
+        <span class="price-current" style="font-size:0.9rem">${formatPrice(item.discount_price)}</span>
       </div>
     `).join('');
   }
 }
 
-// Catalog Renderer
+// AI Assistant Natural Language Intent Parser
+function applyAiPrompt(promptText) {
+  const inputEl = document.getElementById('ai-prompt-input');
+  if (inputEl) inputEl.value = promptText;
+
+  const text = promptText.toLowerCase();
+
+  // Reset filters
+  store.filters.categories = ['lighting', 'furniture', 'posters'];
+  store.filters.maxPrice = 20000;
+  store.filters.inStockOnly = false;
+  store.filters.minRating = 0;
+  store.filters.searchQuery = '';
+
+  if (text.includes('lighting') || text.includes('rgb')) {
+    store.filters.categories = ['lighting'];
+  } else if (text.includes('furniture') || text.includes('desk') || text.includes('chair')) {
+    store.filters.categories = ['furniture'];
+  }
+
+  if (text.includes('3,000') || text.includes('3000')) {
+    store.filters.maxPrice = 3000;
+  } else if (text.includes('8,000') || text.includes('8000')) {
+    store.filters.maxPrice = 8000;
+  }
+
+  if (text.includes('highest rated') || text.includes('4.8+')) {
+    store.filters.sortBy = 'rating';
+  }
+
+  if (text.includes('in stock')) {
+    store.filters.inStockOnly = true;
+  }
+
+  renderCatalog();
+  showToast(`✨ AI Assistant applied filters for: "${promptText}"`);
+}
+
+// Catalog Grid Renderer
 function renderCatalog() {
   const gridContainer = document.getElementById('product-grid');
   if (!gridContainer) return;
+
+  const spotlight = store.products[0];
+  if (spotlight) {
+    document.getElementById('spotlight-img').src = spotlight.image;
+    document.getElementById('spotlight-title').textContent = spotlight.title;
+    document.getElementById('spotlight-desc').textContent = spotlight.description;
+    document.getElementById('spotlight-price').textContent = formatPrice(spotlight.discount_price);
+  }
 
   let filtered = store.products.filter(p => {
     if (store.filters.searchQuery) {
@@ -311,28 +326,24 @@ function renderCatalog() {
     filtered.sort((a, b) => b.rating - a.rating);
   }
 
-  document.getElementById('results-count').textContent = `Showing ${filtered.length} items`;
+  document.getElementById('results-count').textContent = `Showing ${filtered.length} products`;
 
   if (filtered.length === 0) {
     gridContainer.innerHTML = `
-      <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-muted);">
-        <h3>No matching products found</h3>
-        <p>Try adjusting your search query or price sliders.</p>
+      <div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-sub);">
+        <h3>No products match query</h3>
+        <p>Try clearing your AI Assistant prompt or resetting price sliders.</p>
       </div>
     `;
     return;
   }
 
   gridContainer.innerHTML = filtered.map(product => {
-    const isWishlisted = store.wishlist.includes(product.id);
-    const stockAlert = product.stock <= 5 ? `<span class="stock-alert-badge">Only ${product.stock} Left!</span>` : '';
-
     return `
       <div class="product-card" data-id="${product.id}">
         <div class="card-media" onclick="openProductModal('${product.id}')">
           <img src="${product.image}" alt="${product.title}" loading="lazy" />
           <span class="card-badge">${product.category.toUpperCase()}</span>
-          ${stockAlert}
         </div>
 
         <div class="card-content">
@@ -340,7 +351,7 @@ function renderCatalog() {
           
           <div class="card-rating">
             <span>★ ${product.rating}</span>
-            <span style="color:var(--text-muted)">(${product.rating_count})</span>
+            <span style="color:var(--text-sub)">(${product.rating_count})</span>
           </div>
 
           <div class="card-price-row">
@@ -349,10 +360,10 @@ function renderCatalog() {
           </div>
 
           <div class="card-actions">
-            <button class="btn-primary full-width" onclick="addToCart('${product.id}')">
+            <button class="btn-linear full" onclick="addToCart('${product.id}')">
               <span>🛒 Add to Cart</span>
             </button>
-            <button class="btn-one-click full-width" onclick="oneClickBuyNow('${product.id}')">
+            <button class="btn-one-click-sm full" onclick="oneClickBuyNow('${product.id}')">
               <span>⚡ Buy Now (1-Click)</span>
             </button>
           </div>
@@ -362,21 +373,17 @@ function renderCatalog() {
   }).join('');
 }
 
-// 1-Click Ordering System
 function oneClickBuyNow(productId) {
   const p = store.products.find(item => item.id === productId);
   if (!p) return;
 
-  // Generate Instant Order
   const orderId = `#CB-${Math.floor(10000 + Math.random() * 90000)}`;
   showToast(`⚡ 1-Click Purchase Success! Order ${orderId} placed.`);
 
-  // Open Tracking Modal directly
   document.getElementById('tracking-input-id').value = orderId;
   openModal('tracking-modal');
 }
 
-// Open Product Details Modal with Bundle Builder
 function openProductModal(productId) {
   const p = store.products.find(item => item.id === productId);
   if (!p) return;
@@ -385,14 +392,10 @@ function openProductModal(productId) {
   document.getElementById('modal-title').textContent = p.title;
   document.getElementById('modal-category-badge').textContent = p.category.toUpperCase();
   document.getElementById('modal-stock-badge').textContent = p.stock > 0 ? `In Stock (${p.stock})` : 'Out of Stock';
-  document.getElementById('modal-rating-val').textContent = p.rating;
   document.getElementById('modal-price').textContent = formatPrice(p.discount_price);
   document.getElementById('modal-old-price').textContent = formatPrice(p.price);
   document.getElementById('modal-description').textContent = p.description;
 
-  document.getElementById('modal-specs-list').innerHTML = p.specs.map(s => `<li>${s}</li>`).join('');
-
-  // Add to cart & 1-click button bindings
   document.getElementById('modal-add-cart-btn').onclick = () => {
     addToCart(p.id);
     closeModal('product-modal');
@@ -402,21 +405,14 @@ function openProductModal(productId) {
     oneClickBuyNow(p.id);
   };
 
-  // Thumbnail strip
-  document.getElementById('modal-thumbnails').innerHTML = `
-    <img src="${p.image}" class="thumb-img active" />
-    <img src="${p.image}" class="thumb-img" />
-  `;
-
-  // Frequently Bought Together Bundle Builder
   const recs = RecommendationEngine.getRecommendations(p.id, 2);
   const bundleItems = [p, ...recs];
   const bundleTotal = bundleItems.reduce((sum, item) => sum + item.discount_price, 0);
 
   document.getElementById('bundle-items-list').innerHTML = bundleItems.map(item => `
-    <div class="bundle-item-row">
-      <input type="checkbox" checked disabled />
-      <span>${item.title} - <strong>${formatPrice(item.discount_price)}</strong></span>
+    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+      <span>✓ ${item.title}</span>
+      <strong>${formatPrice(item.discount_price)}</strong>
     </div>
   `).join('');
 
@@ -443,7 +439,7 @@ function addToCart(productId) {
 
   store.saveCart();
   updateCartBadge();
-  showToast(`🛒 "${p.title}" added to your cart!`);
+  showToast(`🛒 "${p.title}" added to cart!`);
   RecommendationEngine.renderRecommendationsCarousel();
 }
 
@@ -458,8 +454,7 @@ function renderCartDrawer() {
   if (!container) return;
 
   if (store.cart.length === 0) {
-    container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:30px;">Your cart is empty.</p>`;
-    document.getElementById('cart-subtotal').textContent = formatPrice(0);
+    container.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:30px;">Your cart is empty.</p>`;
     document.getElementById('cart-grand-total').textContent = formatPrice(0);
     return;
   }
@@ -468,38 +463,17 @@ function renderCartDrawer() {
   container.innerHTML = store.cart.map(item => {
     subtotal += item.price * item.qty;
     return `
-      <div class="cart-item">
-        <img src="${item.image}" alt="${item.title}" />
-        <div class="cart-item-details">
-          <h4 style="font-size:0.875rem">${item.title}</h4>
-          <span style="color:var(--accent-cyan); font-weight:700">${formatPrice(item.price)}</span>
-          <div class="qty-controls">
-            <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
-            <span>${item.qty}</span>
-            <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
-          </div>
+      <div style="display:flex; gap:10px; background:rgba(255,255,255,0.03); padding:8px; border-radius:6px;">
+        <img src="${item.image}" style="width:48px; height:48px; object-fit:cover; border-radius:4px;" />
+        <div style="flex:1;">
+          <h5 style="font-size:0.8rem; margin-bottom:4px;">${item.title}</h5>
+          <span style="color:var(--accent-cyan); font-weight:700;">${formatPrice(item.price)} (x${item.qty})</span>
         </div>
       </div>
     `;
   }).join('');
 
-  document.getElementById('cart-subtotal').textContent = formatPrice(subtotal);
   document.getElementById('cart-grand-total').textContent = formatPrice(subtotal);
-  document.getElementById('checkout-total-val').textContent = formatPrice(subtotal);
-}
-
-function updateQty(productId, delta) {
-  const item = store.cart.find(i => i.id === productId);
-  if (!item) return;
-
-  item.qty += delta;
-  if (item.qty <= 0) {
-    store.cart = store.cart.filter(i => i.id !== productId);
-  }
-
-  store.saveCart();
-  updateCartBadge();
-  renderCartDrawer();
 }
 
 function renderAdminTable() {
@@ -511,14 +485,10 @@ function renderAdminTable() {
       <td><code>${p.sku}</code></td>
       <td><strong>${p.title}</strong></td>
       <td>${p.category}</td>
+      <td><input type="number" id="admin-price-${p.id}" value="${p.discount_price}" class="linear-input" style="width:80px" /></td>
+      <td><input type="number" id="admin-stock-${p.id}" value="${p.stock}" class="linear-input" style="width:60px" /></td>
       <td>
-        <input type="number" id="admin-price-${p.id}" value="${p.discount_price}" />
-      </td>
-      <td>
-        <input type="number" id="admin-stock-${p.id}" value="${p.stock}" />
-      </td>
-      <td>
-        <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem" onclick="publishAdminUpdate('${p.id}')">
+        <button class="btn-accent-glow" style="padding:4px 10px; font-size:0.75rem" onclick="publishAdminUpdate('${p.id}')">
           ⚡ Publish Live
         </button>
       </td>
@@ -549,28 +519,22 @@ function showToast(message) {
 }
 
 function openModal(modalId) {
-  const el = document.getElementById(modalId);
-  if (el) el.classList.remove('hidden');
+  document.getElementById(modalId)?.classList.remove('hidden');
 }
 
 function closeModal(modalId) {
-  const el = document.getElementById(modalId);
-  if (el) el.classList.add('hidden');
+  document.getElementById(modalId)?.classList.add('hidden');
 }
 
-// Timers Initialization
-function startTimers() {
+// Telemetry Simulator
+function startTelemetrySimulator() {
   setInterval(() => {
-    const clock = document.getElementById('deal-timer-clock');
-    const primeClock = document.getElementById('prime-order-countdown');
-    const now = new Date();
-    const hours = String(23 - now.getHours()).padStart(2, '0');
-    const mins = String(59 - now.getMinutes()).padStart(2, '0');
-    const secs = String(59 - now.getSeconds()).padStart(2, '0');
-
-    if (clock) clock.textContent = `${hours}h ${mins}m ${secs}s`;
-    if (primeClock) primeClock.textContent = `${hours}h ${mins}m ${secs}s`;
-  }, 1000);
+    const val = Math.floor(10 + Math.random() * 6);
+    const lat1 = document.getElementById('telemetry-latency');
+    const lat2 = document.getElementById('telemetry-latency-val');
+    if (lat1) lat1.textContent = val;
+    if (lat2) lat2.textContent = val;
+  }, 3000);
 }
 
 // DOM Setup
@@ -578,18 +542,44 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCatalog();
   updateCartBadge();
   RecommendationEngine.renderRecommendationsCarousel();
-  startTimers();
+  startTelemetrySimulator();
 
-  // Currency Selector Listener
+  // Dual Theme Toggle Switcher
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  const appBody = document.getElementById('app-body');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+
+  themeBtn?.addEventListener('click', () => {
+    if (appBody.classList.contains('light-theme')) {
+      appBody.classList.remove('light-theme');
+      appBody.classList.add('dark-theme');
+      themeIcon.textContent = '🌙';
+      themeLabel.textContent = 'Dark OS';
+      showToast('Switched to Obsidian Dark AI OS Theme');
+    } else {
+      appBody.classList.remove('dark-theme');
+      appBody.classList.add('light-theme');
+      themeIcon.textContent = '☀️';
+      themeLabel.textContent = 'Quartz OS';
+      showToast('Switched to Quartz Light AI OS Theme');
+    }
+  });
+
+  // AI Assistant Prompt Form
+  document.getElementById('ai-prompt-submit-btn')?.addEventListener('click', () => {
+    const promptVal = document.getElementById('ai-prompt-input').value;
+    if (promptVal) applyAiPrompt(promptVal);
+  });
+
   document.getElementById('currency-select')?.addEventListener('change', (e) => {
     currentCurrency = e.target.value;
     renderCatalog();
     renderCartDrawer();
     RecommendationEngine.renderRecommendationsCarousel();
-    showToast(`Currency changed to ${currentCurrency}`);
+    showToast(`Currency converted to ${currentCurrency}`);
   });
 
-  // Filters
   document.querySelectorAll('input[name="category"]').forEach(cb => {
     cb.addEventListener('change', () => {
       const selected = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(c => c.value);
@@ -613,33 +603,22 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCatalog();
   });
 
-  document.querySelectorAll('input[name="rating-filter"]').forEach(r => {
-    r.addEventListener('change', (e) => {
-      store.filters.minRating = Number(e.target.value);
-      renderCatalog();
-    });
-  });
-
   document.getElementById('sort-select')?.addEventListener('change', (e) => {
     store.filters.sortBy = e.target.value;
     renderCatalog();
   });
 
-  const searchInput = document.getElementById('global-search-input');
-  searchInput?.addEventListener('input', (e) => {
+  document.getElementById('global-search-input')?.addEventListener('input', (e) => {
     store.filters.searchQuery = e.target.value;
     renderCatalog();
   });
 
   document.getElementById('cart-drawer-trigger')?.addEventListener('click', () => {
     renderCartDrawer();
-    document.getElementById('cart-drawer-overlay')?.classList.remove('hidden');
+    openModal('cart-drawer-overlay');
   });
 
-  document.getElementById('cart-drawer-close')?.addEventListener('click', () => {
-    document.getElementById('cart-drawer-overlay')?.classList.add('hidden');
-  });
-
+  document.getElementById('cart-drawer-close')?.addEventListener('click', () => closeModal('cart-drawer-overlay'));
   document.getElementById('admin-console-toggle')?.addEventListener('click', () => {
     renderAdminTable();
     openModal('admin-modal');
@@ -649,36 +628,29 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('product-modal-close')?.addEventListener('click', () => closeModal('product-modal'));
 
   document.getElementById('checkout-trigger-btn')?.addEventListener('click', () => {
-    document.getElementById('cart-drawer-overlay')?.classList.add('hidden');
+    closeModal('cart-drawer-overlay');
     openModal('checkout-modal');
   });
 
   document.getElementById('to-step-2-btn')?.addEventListener('click', () => {
     document.getElementById('checkout-step-1').classList.add('hidden');
     document.getElementById('checkout-step-2').classList.remove('hidden');
-    document.getElementById('step-ind-1').classList.remove('active');
-    document.getElementById('step-ind-2').classList.add('active');
   });
 
   document.getElementById('back-to-step-1-btn')?.addEventListener('click', () => {
     document.getElementById('checkout-step-2').classList.add('hidden');
     document.getElementById('checkout-step-1').classList.remove('hidden');
-    document.getElementById('step-ind-2').classList.remove('active');
-    document.getElementById('step-ind-1').classList.active;
   });
 
   document.getElementById('place-order-btn')?.addEventListener('click', () => {
     document.getElementById('checkout-step-2').classList.add('hidden');
     document.getElementById('checkout-step-3').classList.remove('hidden');
-    document.getElementById('step-ind-2').classList.remove('active');
-    document.getElementById('step-ind-3').classList.add('active');
     store.cart = [];
     store.saveCart();
     updateCartBadge();
   });
 
   document.getElementById('checkout-modal-close')?.addEventListener('click', () => closeModal('checkout-modal'));
-
   document.getElementById('track-order-btn')?.addEventListener('click', () => openModal('tracking-modal'));
   document.getElementById('track-this-order-btn')?.addEventListener('click', () => {
     closeModal('checkout-modal');
